@@ -4,11 +4,13 @@ import { Pie } from "@visx/shape";
 import { memo } from "react";
 import { animated, useTransition, interpolate } from "@react-spring/web";
 import { maxHeight, maxWidth } from "../config";
+import { useState } from "react";
 
 const margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
 const PieChart = memo(({ width, height, data }) => {
   const value = (d) => d.value;
+  const [selectedSlice, setSelectedSlice] = useState(null);
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -24,7 +26,9 @@ const PieChart = memo(({ width, height, data }) => {
     <svg width={w} height={h}>
       <Group top={centerY + margin.top} left={centerX + margin.left}>
         <Pie
-          data={data}
+          data={
+            selectedSlice ? data.filter(({ id }) => id === selectedSlice) : data
+          }
           pieValue={value}
           pieSortValues={pieSortValues}
           outerRadius={radius}
@@ -37,7 +41,12 @@ const PieChart = memo(({ width, height, data }) => {
                   {...pie}
                   animate={true}
                   getKey={() => {}}
-                  onClickDatum={() => {}}
+                  onMouseEnterDatum={({ data }) => {
+                    setTimeout(() => setSelectedSlice(data.id), 500);
+                  }}
+                  onMouseLeaveDatum={() => {
+                    setTimeout(() => setSelectedSlice(null), 500);
+                  }}
                   getColor={(arc) => arc.data.color}
                 />
               </>
@@ -63,7 +72,15 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   opacity: 1,
 });
 
-function AnimatedPie({ animate, arcs, path, getKey, getColor, onClickDatum }) {
+function AnimatedPie({
+  animate,
+  arcs,
+  path,
+  getKey,
+  getColor,
+  onMouseEnterDatum,
+  onMouseLeaveDatum,
+}) {
   const transitions = useTransition(arcs, {
     from: animate ? fromLeaveTransition : enterUpdateTransition,
     enter: enterUpdateTransition,
@@ -87,8 +104,8 @@ function AnimatedPie({ animate, arcs, path, getKey, getColor, onClickDatum }) {
               })
           )}
           fill={getColor(arc)}
-          onClick={() => onClickDatum(arc)}
-          onTouchStart={() => onClickDatum(arc)}
+          onMouseEnter={() => onMouseEnterDatum(arc)}
+          onMouseLeave={() => onMouseLeaveDatum(arc)}
         />
       </g>
     );
