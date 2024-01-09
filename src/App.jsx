@@ -13,14 +13,13 @@ function App() {
       </ParentSize>
 
       <div className="indicators">
-        {pieChartData.map(({ label, gradient, numbers, value }, key) => {
-          const { from, to } = gradient;
+        {pieChartData.map(({ label, color, numbers, value }, key) => {
           return (
             <div key={key} className="indicator-line">
               <div
                 className="indicator-color"
                 style={{
-                  background: `linear-gradient(90deg, ${from} 35%, ${to} 100%)`,
+                  background: color,
                 }}
               />
               <div className="indicator-name">

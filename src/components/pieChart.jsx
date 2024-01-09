@@ -3,15 +3,12 @@ import { Group } from "@visx/group";
 import { Pie } from "@visx/shape";
 import { memo } from "react";
 import { animated, useTransition, interpolate } from "@react-spring/web";
-import { LinearGradient } from "@visx/gradient";
+import { maxHeight, maxWidth } from "../config";
 
 const margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
 const PieChart = memo(({ width, height, data }) => {
   const value = (d) => d.value;
-  // const { gradient } = data;
-  // const { from, to } = gradient;
-  // console.log(from);
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -20,15 +17,12 @@ const PieChart = memo(({ width, height, data }) => {
   const centerX = innerWidth / 2;
   const pieSortValues = (a, b) => b - a;
 
-  const maxHeight = 300;
-  const maxWidth = 300;
   const h = Math.min(height, maxHeight);
   const w = Math.min(width, maxWidth);
 
   return (
     <svg width={w} height={h}>
       <Group top={centerY + margin.top} left={centerX + margin.left}>
-        {/* <LinearGradient from={from} to={to} />; */}
         <Pie
           data={data}
           pieValue={value}
@@ -37,7 +31,6 @@ const PieChart = memo(({ width, height, data }) => {
           innerRadius={radius / 1.5}
         >
           {(pie) => {
-            console.log(pie);
             return (
               <>
                 <AnimatedPie
@@ -79,13 +72,10 @@ function AnimatedPie({ animate, arcs, path, getKey, getColor, onClickDatum }) {
     keys: getKey,
   });
   return transitions((props, arc) => {
-    console.log(props);
     const { data } = arc;
-    const { gradient, id } = data;
-    const { from, to } = gradient;
+    const { id } = data;
     return (
       <g key={id}>
-        <LinearGradient from={from} to={to} id={`gradient${id}`} />
         <animated.path
           d={interpolate(
             [props.startAngle, props.endAngle],
